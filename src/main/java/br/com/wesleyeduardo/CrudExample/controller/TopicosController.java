@@ -5,8 +5,12 @@ import br.com.wesleyeduardo.CrudExample.dto.TopicoDTO;
 import br.com.wesleyeduardo.CrudExample.repository.CursoRepository;
 import br.com.wesleyeduardo.CrudExample.repository.TopicoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -33,11 +37,16 @@ public class TopicosController {
 
 
     @PostMapping
-    public void cadastrar(@RequestBody TopicoForm topicoForm){
+    public ResponseEntity<TopicoDTO> cadastrar(@RequestBody TopicoForm topicoForm, UriComponentsBuilder uriBuilder){
 
        Topico topico = topicoForm.converter(cursoRepository);
 
        topicoRepository.save(topico);
+
+       URI uri = uriBuilder.path("/topicos/{id}").buildAndExpand(topico.getId()).toUri();
+
+       return ResponseEntity.created(uri).body(new TopicoDTO(topico));
+
     }
 
 

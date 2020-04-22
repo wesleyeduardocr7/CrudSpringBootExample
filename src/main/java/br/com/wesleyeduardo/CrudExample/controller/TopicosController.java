@@ -1,4 +1,5 @@
 package br.com.wesleyeduardo.CrudExample.controller;
+import br.com.wesleyeduardo.CrudExample.dto.DetalhesTopicoDTO;
 import br.com.wesleyeduardo.CrudExample.form.TopicoForm;
 import br.com.wesleyeduardo.CrudExample.modelo.Topico;
 import br.com.wesleyeduardo.CrudExample.dto.TopicoDTO;
@@ -47,6 +48,18 @@ public class TopicosController {
        return ResponseEntity.created(uri).body(new TopicoDTO(topico));
 
     }
+
+
+    @GetMapping("/{id}")
+    public DetalhesTopicoDTO detalhar(@PathVariable Long id){
+
+        Topico topico = topicoRepository.getOne(id);
+
+        return new DetalhesTopicoDTO(topico);
+    }
+
+
+
 
 
 

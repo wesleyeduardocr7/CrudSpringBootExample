@@ -1,4 +1,5 @@
 package br.com.wesleyeduardo.CrudExample.controller;
+import br.com.wesleyeduardo.CrudExample.form.AtualizacaoTopicoForm;
 import br.com.wesleyeduardo.CrudExample.dto.DetalhesTopicoDTO;
 import br.com.wesleyeduardo.CrudExample.form.TopicoForm;
 import br.com.wesleyeduardo.CrudExample.modelo.Topico;
@@ -9,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
@@ -59,7 +62,14 @@ public class TopicosController {
     }
 
 
+    @PutMapping("/{id}")
+    @Transactional
+    public ResponseEntity<TopicoDTO> atualizar(@PathVariable Long id, @RequestBody @Valid AtualizacaoTopicoForm form){
 
+       Topico topico =  form.atualizar(id,topicoRepository);
+
+        return ResponseEntity.ok(new TopicoDTO(topico));
+    }
 
 
 

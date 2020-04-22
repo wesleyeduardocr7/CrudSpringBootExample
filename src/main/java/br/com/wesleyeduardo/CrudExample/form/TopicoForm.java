@@ -3,12 +3,21 @@ package br.com.wesleyeduardo.CrudExample.form;
 import br.com.wesleyeduardo.CrudExample.modelo.Curso;
 import br.com.wesleyeduardo.CrudExample.modelo.Topico;
 import br.com.wesleyeduardo.CrudExample.repository.CursoRepository;
+import org.hibernate.validator.constraints.Length;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 public class TopicoForm {
 
 
+    @NotNull @NotEmpty @Length(min = 5)
     private String titulo;
+
+    @NotNull @NotEmpty @Length(min = 10)
     private String mensagem;
+
+    @NotNull @NotEmpty
     private String nomeCurso;
 
     public String getTitulo() {

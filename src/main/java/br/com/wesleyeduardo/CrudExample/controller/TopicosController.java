@@ -1,9 +1,12 @@
 package br.com.wesleyeduardo.CrudExample.controller;
 import br.com.wesleyeduardo.CrudExample.form.AtualizacaoTopicoForm;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import br.com.wesleyeduardo.CrudExample.dto.DetalhesTopicoDTO;
 import br.com.wesleyeduardo.CrudExample.form.TopicoForm;
 import br.com.wesleyeduardo.CrudExample.modelo.Topico;
-import br.com.wesleyeduardo.CrudExample.dto.TopicoDTO;
+import br.com.wesleyeduardo.CrudExample.dto.TopicoDto;
 import br.com.wesleyeduardo.CrudExample.repository.CursoRepository;
 import br.com.wesleyeduardo.CrudExample.repository.TopicoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +17,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.net.URI;
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -28,21 +30,23 @@ public class TopicosController {
     private CursoRepository cursoRepository;
 
     @GetMapping
-    public List<TopicoDTO> lista(String nomeCurso){
+    public Page<TopicoDto> lista(@RequestParam(required = false) String nomeCurso,
+                                 @RequestParam int pagina, @RequestParam int qtd) {
 
-        if(nomeCurso == null){
-            List<Topico> topicos = topicoRepository.findAll();
-            return TopicoDTO.converter(topicos);
-        }else{
-            List<Topico> topicos = topicoRepository.findByCurso_Nome(nomeCurso);
-            return TopicoDTO.converter(topicos);
+        Pageable paginacao = PageRequest.of(pagina,qtd);
+
+        if (nomeCurso == null) {
+            Page<Topico> topicos = topicoRepository.findAll(paginacao);
+            return TopicoDto.converter(topicos);
+        } else {
+            Page<Topico> topicos = topicoRepository.findByCursoNome(nomeCurso, paginacao);
+            return TopicoDto.converter(topicos);
         }
     }
 
-
     @PostMapping
     @Transactional
-    public ResponseEntity<TopicoDTO> cadastrar(@RequestBody @Valid TopicoForm topicoForm, UriComponentsBuilder uriBuilder){
+    public ResponseEntity<TopicoDto> cadastrar(@RequestBody @Valid TopicoForm topicoForm, UriComponentsBuilder uriBuilder){
 
        Topico topico = topicoForm.converter(cursoRepository);
 
@@ -50,7 +54,7 @@ public class TopicosController {
 
        URI uri = uriBuilder.path("/topicos/{id}").buildAndExpand(topico.getId()).toUri();
 
-       return ResponseEntity.created(uri).body(new TopicoDTO(topico));
+       return ResponseEntity.created(uri).body(new TopicoDto(topico));
 
     }
 
@@ -70,13 +74,13 @@ public class TopicosController {
 
     @PutMapping("/{id}")
     @Transactional
-    public ResponseEntity<TopicoDTO> atualizar(@PathVariable Long id, @RequestBody @Valid AtualizacaoTopicoForm form){
+    public ResponseEntity<TopicoDto> atualizar(@PathVariable Long id, @RequestBody @Valid AtualizacaoTopicoForm form){
 
         Optional<Topico> optional = topicoRepository.findById(id);
 
         if(optional.isPresent()){
             Topico topico =  form.atualizar(id,topicoRepository);
-            return ResponseEntity.ok(new TopicoDTO(topico));
+            return ResponseEntity.ok(new TopicoDto(topico));
         }
 
         return ResponseEntity.notFound().build();

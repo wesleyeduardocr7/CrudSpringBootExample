@@ -1,5 +1,6 @@
 package br.com.wesleyeduardo.CrudExample.controller;
 import br.com.wesleyeduardo.CrudExample.form.AtualizacaoTopicoForm;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import br.com.wesleyeduardo.CrudExample.dto.DetalhesTopicoDTO;
@@ -39,11 +40,10 @@ public class TopicosController {
     private CursoRepository cursoRepository;
 
     @GetMapping
+    @Cacheable(value = "listaDeTopicos")
     public Page<TopicoDto> lista(@RequestParam(required = false) String nomeCurso,
                                  @PageableDefault(sort = "id", direction = Sort.Direction.DESC,
                                  page = 0, size = 10) Pageable paginacao) {
-
-        //Pageable paginacao = PageRequest.of(pagina,qtd, Sort.Direction.DESC,ordenacao);
 
         if (nomeCurso == null) {
             Page<Topico> topicos = topicoRepository.findAll(paginacao);

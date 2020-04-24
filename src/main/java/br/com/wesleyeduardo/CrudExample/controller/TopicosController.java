@@ -1,7 +1,6 @@
 package br.com.wesleyeduardo.CrudExample.controller;
 import br.com.wesleyeduardo.CrudExample.form.AtualizacaoTopicoForm;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import br.com.wesleyeduardo.CrudExample.dto.DetalhesTopicoDTO;
 import br.com.wesleyeduardo.CrudExample.form.TopicoForm;
@@ -10,14 +9,24 @@ import br.com.wesleyeduardo.CrudExample.dto.TopicoDto;
 import br.com.wesleyeduardo.CrudExample.repository.CursoRepository;
 import br.com.wesleyeduardo.CrudExample.repository.TopicoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import javax.transaction.Transactional;
-import javax.validation.Valid;
 import java.net.URI;
 import java.util.Optional;
+import javax.transaction.Transactional;
+import javax.validation.Valid;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 
 @RestController
 @RequestMapping("/topicos")
@@ -31,9 +40,10 @@ public class TopicosController {
 
     @GetMapping
     public Page<TopicoDto> lista(@RequestParam(required = false) String nomeCurso,
-                                 @RequestParam int pagina, @RequestParam int qtd) {
+                                 @PageableDefault(sort = "id", direction = Sort.Direction.DESC,
+                                 page = 0, size = 10) Pageable paginacao) {
 
-        Pageable paginacao = PageRequest.of(pagina,qtd);
+        //Pageable paginacao = PageRequest.of(pagina,qtd, Sort.Direction.DESC,ordenacao);
 
         if (nomeCurso == null) {
             Page<Topico> topicos = topicoRepository.findAll(paginacao);
